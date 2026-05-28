@@ -26,10 +26,10 @@ Written in pure Python over raw JSON-RPC. No pip install needed.
 Then activate it in your LSP config:
 
 ```lua
-vim.lsp.enable("openapi_goto_def")
+vim.lsp.enable("lsp_openapi")
 ```
 
-The plugin ships `lsp/openapi_goto_def.lua`, which Neovim 0.11+ picks up automatically once the plugin is on the runtimepath. No `setup()` call needed.
+The plugin ships `lsp/lsp_openapi.lua`, which Neovim 0.11+ picks up automatically once the plugin is on the runtimepath. No `setup()` call needed.
 
 ### Local development
 
@@ -86,5 +86,5 @@ lsp-openapi/
 ├── README.md
 ├── server.py                  # the LSP server
 └── lsp/
-    └── openapi_goto_def.lua   # Neovim 0.11 LSP config (auto-discovered)
+    └── lsp_openapi.lua   # Neovim 0.11 LSP config (auto-discovered)
 ```
