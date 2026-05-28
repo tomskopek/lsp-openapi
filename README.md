@@ -1,4 +1,4 @@
-# openapi-goto-def
+# lsp-openapi
 
 A tiny, zero-dependency LSP server that adds go-to-definition for OpenAPI YAML specs:
 
@@ -18,7 +18,7 @@ Written in pure Python over raw JSON-RPC. No pip install needed.
 
 ```lua
 {
-  "your-org/openapi-goto-def",
+  "tomskopek/lsp-openapi",
   ft = "yaml",
 }
 ```
@@ -35,7 +35,7 @@ The plugin ships `lsp/openapi_goto_def.lua`, which Neovim 0.11+ picks up automat
 
 ```lua
 {
-  dir = "~/dev/openapi-goto-def",
+  dir = "~/dev/lsp-openapi",
   ft = "yaml",
 }
 ```
@@ -44,7 +44,7 @@ The plugin ships `lsp/openapi_goto_def.lua`, which Neovim 0.11+ picks up automat
 
 Point your LSP client at `server.py`:
 
-- Command: `python3 /path/to/openapi-goto-def/server.py`
+- Command: `python3 /path/to/lsp-openapi/server.py`
 - Filetypes: `yaml`
 - Root markers: `.git`
 
@@ -82,7 +82,7 @@ Limitations: plain mapping keys only — no list-item refs, anchors, or HTTP(S) 
 ## Layout
 
 ```
-openapi-goto-def/
+lsp-openapi/
 ├── README.md
 ├── server.py                  # the LSP server
 └── lsp/
