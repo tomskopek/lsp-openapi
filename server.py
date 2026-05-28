@@ -50,8 +50,8 @@ def find_yaml_path(lines: list[str], segments: list[str]):
 
 
 def read_message(stream) -> dict | None:
-    """Read a JSON-RPC message from the LSP client."""
-    headers = {}
+    """Read a JSON-RPC message from the LSP client. `stream` is a binary stream."""
+    headers: dict[str, str] = {}
     while True:
         line = stream.readline()
         if not line:
@@ -59,21 +59,22 @@ def read_message(stream) -> dict | None:
         line = line.strip()
         if not line:
             break
-        key, _, value = line.partition(": ")
-        headers[key] = value
+        key, _, value = line.partition(b": ")
+        headers[key.decode("ascii")] = value.decode("ascii")
 
     length = int(headers.get("Content-Length", 0))
     if length == 0:
         return None
 
+    # Content-Length is bytes per LSP spec; read from the binary stream.
     body = stream.read(length)
     return json.loads(body)
 
 
 def send_message(stream, msg: dict):
-    """Send a JSON-RPC message to the LSP client."""
-    body = json.dumps(msg)
-    header = "Content-Length: {}\r\n\r\n".format(len(body.encode("utf-8")))
+    """Send a JSON-RPC message to the LSP client. `stream` is a binary stream."""
+    body = json.dumps(msg).encode("utf-8")
+    header = "Content-Length: {}\r\n\r\n".format(len(body)).encode("ascii")
     stream.write(header + body)
     stream.flush()
 
@@ -268,9 +269,13 @@ class OpenApiLsp:
 
 
 def main():
-    stdin = sys.stdin
-    stdout = sys.stdout
-    # Reopen stdin/stdout in text mode for clean I/O
+    # Use binary streams so Content-Length (bytes per LSP spec) matches what
+    # we read. Text-mode stdin would translate newlines and decode UTF-8 into
+    # code points, which desyncs the byte count for non-ASCII payloads.
+    stdin = sys.stdin.buffer
+    stdout = sys.stdout.buffer
+    # Redirect text-mode stdin/stdout to /dev/null so stray prints can't
+    # corrupt the LSP protocol.
     sys.stdin = open("/dev/null", "r")
     sys.stdout = open("/dev/null", "w")
 
