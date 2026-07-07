@@ -9,6 +9,7 @@ Zero dependencies - raw JSON-RPC over stdio.
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 
@@ -91,10 +92,37 @@ def respond_error(stream, id, code, message):
 
 
 class OpenApiLsp:
-    def __init__(self):
+    def __init__(self, stdout):
         self.documents: dict[str, list[str]] = {}  # uri -> lines
         self.root_uri: str | None = None
         self.root_path: str | None = None
+        self.stdout = stdout
+        self._rg_checked = False
+        self._rg_path: str | None = None
+
+    def _get_rg(self) -> str | None:
+        if self._rg_checked:
+            return self._rg_path
+        self._rg_checked = True
+        self._rg_path = shutil.which("rg")
+        if self._rg_path is None:
+            send_message(
+                self.stdout,
+                {
+                    "jsonrpc": "2.0",
+                    "method": "window/showMessage",
+                    "params": {
+                        "type": 2,  # Warning
+                        "message": (
+                            "OpenAPI LSP: ripgrep ('rg') not found on PATH — "
+                            "operationId go-to-definition is disabled. Install: "
+                            "'brew install ripgrep' (macOS) or "
+                            "'apt install ripgrep' (Linux)."
+                        ),
+                    },
+                },
+            )
+        return self._rg_path
 
     def handle(self, msg: dict) -> dict | None:
         method = msg.get("method", "")
@@ -217,13 +245,17 @@ class OpenApiLsp:
         }
 
     def _find_definition(self, func_name: str):
+        rg = self._get_rg()
+        if not rg:
+            return None
+
         search_dir = self.root_path or os.getcwd()
         pattern = f"def {func_name}("
 
         try:
             result = subprocess.run(
                 [
-                    "rg",
+                    rg,
                     "--vimgrep",
                     "--fixed-strings",
                     pattern,
@@ -279,7 +311,7 @@ def main():
     sys.stdin = open("/dev/null", "r")
     sys.stdout = open("/dev/null", "w")
 
-    server = OpenApiLsp()
+    server = OpenApiLsp(stdout)
 
     while True:
         msg = read_message(stdin)
