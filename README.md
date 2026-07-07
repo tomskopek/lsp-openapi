@@ -40,6 +40,37 @@ The plugin ships `lsp/lsp_openapi.lua`, which Neovim 0.11+ picks up automaticall
 }
 ```
 
+## Install (Cursor / VS Code)
+
+Grab the latest `.vsix` from GitHub Releases and install it via the CLI:
+
+```sh
+curl -L -o /tmp/lsp-openapi.vsix https://github.com/tomskopek/lsp-openapi/releases/latest/download/lsp-openapi.vsix
+cursor --install-extension /tmp/lsp-openapi.vsix   # or: code --install-extension
+```
+
+Or install through the UI: Cmd+Shift+P → `Extensions: Install from VSIX...` → pick the downloaded file.
+
+Restart the editor (or Cmd+Shift+P → "Developer: Reload Window") and the extension activates on any `.yaml` file.
+
+If `python3` isn't on your PATH under the name `python3`, set it in `settings.json`:
+
+```json
+"lspOpenapi.python": "/full/path/to/python3"
+```
+
+### Building the .vsix from source
+
+If you need a fresh build (or you're contributing):
+
+```sh
+cd vscode
+npm install
+npm run package
+```
+
+That produces `lsp-openapi-<version>.vsix` in the `vscode/` directory.
+
 ## Install (other editors)
 
 Point your LSP client at `server.py`:
@@ -85,6 +116,9 @@ Limitations: plain mapping keys only — no list-item refs, anchors, or HTTP(S) 
 lsp-openapi/
 ├── README.md
 ├── server.py                  # the LSP server
-└── lsp/
-    └── lsp_openapi.lua   # Neovim 0.11 LSP config (auto-discovered)
+├── lsp/
+│   └── lsp_openapi.lua        # Neovim 0.11 LSP config (auto-discovered)
+└── vscode/
+    ├── package.json           # VS Code / Cursor extension manifest
+    └── src/extension.ts       # spawns server.py via vscode-languageclient
 ```
