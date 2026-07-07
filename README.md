@@ -45,8 +45,8 @@ The plugin ships `lsp/lsp_openapi.lua`, which Neovim 0.11+ picks up automaticall
 Grab the latest `.vsix` from GitHub Releases and install it via the CLI:
 
 ```sh
-curl -L -o /tmp/lsp-openapi.vsix https://github.com/tomskopek/lsp-openapi/releases/latest/download/lsp-openapi.vsix
-cursor --install-extension /tmp/lsp-openapi.vsix   # or: code --install-extension
+curl -L -o ~/Downloads/lsp-openapi.vsix https://github.com/tomskopek/lsp-openapi/releases/latest/download/lsp-openapi.vsix
+cursor --install-extension ~/Downloads/lsp-openapi.vsix   # or: code --install-extension
 ```
 
 Or install through the UI: Cmd+Shift+P → `Extensions: Install from VSIX...` → pick the downloaded file.
